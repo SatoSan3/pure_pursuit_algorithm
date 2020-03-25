@@ -206,7 +206,7 @@ void updatePurePursuitAlgorithm() {
     }
 }
 int main(int argc, char** argv) {
-    ros::init(argc, argv, "machine_driver");
+    ros::init(argc, argv, "machine_driver2");
     ros::NodeHandle nh;
     ros::Rate rate(10);
 
