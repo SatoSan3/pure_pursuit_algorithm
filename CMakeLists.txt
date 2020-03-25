@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   geometry_msgs
   tf
+  nav_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -208,5 +209,7 @@ include_directories(
 # catkin_add_nosetests(test)
 
 add_executable(machine_driver2 src/driver/machine_driver.cpp)
+add_executable(path_publisher src/path_publisher/path_publisher.cpp)
 
 target_link_libraries(machine_driver2 ${catkin_LIBRARIES})
+target_link_libraries(path_publisher ${catkin_LIBRARIES})
