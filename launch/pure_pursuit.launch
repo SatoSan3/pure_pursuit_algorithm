@@ -1,5 +1,5 @@
 <launch>
-  <arg name="path_file" default="$(find pure_pursuit_algorithm)/maps/world_map.yaml"/>
+  <arg name="path_file" default="$(find pure_pursuit_algorithm)/path/output.csv"/>
   <!-- <node pkg="pure_pursuit_algorithm" name="pure_pursuit_algorithm" type="machine_driver2"  output="screen"/> -->
   <node pkg="pure_pursuit_algorithm" name="path" type="path_publisher"  output="screen">
     <param name="test_param" value="$(arg path_file)" />

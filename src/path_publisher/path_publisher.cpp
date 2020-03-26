@@ -8,6 +8,24 @@
 
 #include "DataManager.hpp"
 
+nav_msgs::Path makePath(std::vector<std::vector<double>> path_data) {
+    nav_msgs::Path path;
+    path.header.frame_id = "map";
+    for (int i = 0; i < path_data.size(); ++i) {
+        geometry_msgs::PoseStamped ps;
+        ps.pose.position.x = path_data[i][0];
+        ps.pose.position.y = path_data[i][1];
+        ps.pose.position.z = 0;
+        ps.pose.orientation.x = 0;
+        ps.pose.orientation.y = 0;
+        ps.pose.orientation.z = std::sin(path_data[i][2] / 2.0);
+        ps.pose.orientation.w = std::cos(path_data[i][2] / 2.0);
+
+        path.poses.push_back(ps);
+    }
+
+    return path;
+}
 int main(int argc, char** argv) {
     std::cout << "aaaa" << std::endl;
     ros::init(argc, argv, "path_publisher");
@@ -20,22 +38,11 @@ int main(int argc, char** argv) {
     n.getParam("test_param", file_name);
     std::cout << file_name << std::endl;
 
-    nav_msgs::Path path;
-    geometry_msgs::PoseStamped ps;
-    ps.pose.position.x = 10;
-    ps.pose.position.y = 0;
-    ps.pose.orientation.x = 0;
-    ps.pose.orientation.y = 0;
-    ps.pose.orientation.z = 0;
-    ps.pose.orientation.w = 1;
-
-    path.poses.push_back(ps);
-
     ros::Publisher path_pub = n.advertise<nav_msgs::Path>("path_p", 10);
     // path.poses.push_back()
 
     DataManager dm;
-    dm.readFileData("output.csv");
+    dm.readFileData(file_name);
     std::vector<std::vector<double>> a = dm.getStoredData();
 
     for (int i = 0; i < a.size(); i++) {
@@ -45,13 +52,9 @@ int main(int argc, char** argv) {
         std::cout << std::endl;
     }
 
-    while (ros::ok()) {
-        std::cout << "bbbb" << std::endl;
-        // std_msgs::String msg;
-        // msg.data = "hello world!";
-        // ROS_INFO("publish: %s", msg.data.c_str());
-        // chatter_pub.publish(msg);
+    nav_msgs::Path path = makePath(a);
 
+    while (ros::ok()) {
         path_pub.publish(path);
 
         ros::spinOnce();
