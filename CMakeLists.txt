@@ -209,7 +209,11 @@ include_directories(
 # catkin_add_nosetests(test)
 
 add_executable(machine_driver2 src/driver/machine_driver.cpp)
-add_executable(path_publisher src/path_publisher/path_publisher.cpp)
+add_executable(
+  path_publisher 
+  src/path_publisher/path_publisher.cpp
+  src/path_publisher/DataManager.cpp
+)
 
 target_link_libraries(machine_driver2 ${catkin_LIBRARIES})
 target_link_libraries(path_publisher ${catkin_LIBRARIES})

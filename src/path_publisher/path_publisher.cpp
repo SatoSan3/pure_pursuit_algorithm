@@ -1,13 +1,24 @@
 #include <geometry_msgs/PoseStamped.h>
+#include <iostream>
 #include <nav_msgs/Path.h>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
+#include <string>
+#include <vector>
+
+#include "DataManager.hpp"
 
 int main(int argc, char** argv) {
+    std::cout << "aaaa" << std::endl;
     ros::init(argc, argv, "path_publisher");
-    ros::NodeHandle n;
+    ros::NodeHandle n("~");
     ros::Publisher chatter_pub = n.advertise<std_msgs::String>("chatter", 10);
     ros::Rate loop_rate(10);
+
+    int param_data;
+    std::string file_name;
+    n.getParam("test_param", file_name);
+    std::cout << file_name << std::endl;
 
     nav_msgs::Path path;
     geometry_msgs::PoseStamped ps;
@@ -23,7 +34,19 @@ int main(int argc, char** argv) {
     ros::Publisher path_pub = n.advertise<nav_msgs::Path>("path_p", 10);
     // path.poses.push_back()
 
+    DataManager dm;
+    dm.readFileData("output.csv");
+    std::vector<std::vector<double>> a = dm.getStoredData();
+
+    for (int i = 0; i < a.size(); i++) {
+        for (int j = 0; j < a[i].size(); j++) {
+            std::cout << a[i][j] << " , ";
+        }
+        std::cout << std::endl;
+    }
+
     while (ros::ok()) {
+        std::cout << "bbbb" << std::endl;
         // std_msgs::String msg;
         // msg.data = "hello world!";
         // ROS_INFO("publish: %s", msg.data.c_str());
