@@ -1,5 +1,6 @@
 #include "ros/ros.h"
 #include <geometry_msgs/Twist.h>
+#include <nav_msgs/Path.h>
 #include <tf/transform_listener.h>
 
 #include <string>
@@ -205,10 +206,17 @@ void updatePurePursuitAlgorithm() {
         moveTargetPoint(ppa.cx[ROUTE_SIZE - 1], ppa.cy[ROUTE_SIZE - 1], angleList[ROUTE_SIZE - 1]);
     }
 }
+
+void receivePath(const nav_msgs::Path& path) {
+    std::cout << "receive" << std::endl;
+}
+
 int main(int argc, char** argv) {
     ros::init(argc, argv, "machine_driver2");
     ros::NodeHandle nh;
     ros::Rate rate(10);
+
+    ros::Subscriber sub = nh.subscribe("path/robot_path", 10, receivePath);
 
     //速度制御(cmd_vel)の準備
 

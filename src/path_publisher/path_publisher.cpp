@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
     n.getParam("test_param", file_name);
     std::cout << file_name << std::endl;
 
-    ros::Publisher path_pub = n.advertise<nav_msgs::Path>("path_p", 10);
+    ros::Publisher path_pub = n.advertise<nav_msgs::Path>("robot_path", 10);
     // path.poses.push_back()
 
     DataManager dm;
