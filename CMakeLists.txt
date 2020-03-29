@@ -208,7 +208,11 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
-add_executable(machine_driver2 src/driver/machine_driver.cpp)
+add_executable(
+  machine_driver2 
+  src/driver/machine_driver.cpp
+  src/driver/PurePursuitAlgorithm.cpp
+  )
 add_executable(
   path_publisher 
   src/path_publisher/path_publisher.cpp
