@@ -3,18 +3,18 @@
 
 #define ROUTE_SIZE 1800
 
+#include <geometry_msgs/Twist.h>
 #include <math.h>
 
 class State {
 public:
     void init(float new_time_stamp, float new_position_x, float new_position_y, float new_yaw) {
+        time_stamp = new_time_stamp;
         position_x = new_position_x;
         position_y = new_position_y;
         yaw = new_yaw;
-
-        //updateでvを限りなく0にするために大きな値でtimes_stampを引く
-        time_stamp = new_time_stamp - 10000.f;
-        update(new_time_stamp, position_x, position_y, yaw);
+        velocity = 0;
+        velocityYaw = 0;
     }
     bool update(float new_time_stamp, float new_position_x, float new_position_y, float new_yaw) {
         float dt = new_time_stamp - time_stamp;
@@ -25,6 +25,7 @@ public:
         float velocity_y = (new_position_y - position_y) / dt;
 
         velocity = std::hypot(velocity_x, velocity_y);
+        velocityYaw = atan2f(velocity_x, velocity_y);
 
         time_stamp = new_time_stamp;
         position_x = new_position_x;
@@ -37,8 +38,9 @@ public:
     float getPositionY(){return position_y};
     float getYaw(){return yaw};
     float getVelocity(){return velocity};
+    float getVelocityYaw(){return velocityYaw};
 
-    float time_stamp, position_x, position_y, yaw, velocity;
+    float time_stamp, position_x, position_y, yaw, velocity, velocityYaw;
 };
 
 class PurePursuitAlgorithm {
@@ -55,6 +57,7 @@ public:
     //angle2を原点として、angle1との差を返す
     float getDifferenceAngle(float angle1, float angle2);
     float convertAngle(float convertedAngle);
+    geometry_msgs::Twist getCommandVelocity();
 
     const float k = 0.4;    // look forward gain
     const float Lfc = 0.20; // look-ahead distance
@@ -69,6 +72,8 @@ public:
     float cx[ROUTE_SIZE];
     float cy[ROUTE_SIZE];
     float angleList[ROUTE_SIZE];
+
+    geometry_msgs::Twist vel;
 };
 
 #endif

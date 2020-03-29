@@ -1,12 +1,11 @@
 #include "PurePursuitAlgorithm.hpp"
 
-void PurePursuitAlgorithm::init(float newX, float newY, float newYaw, float newV) {
-    state.init(newX, newY, newYaw, newV);
+void PurePursuitAlgorithm::init(float time_stamp, float position_x, float position_y, float yaw) {
+    state.init(time_stamp, position_x, position_y, yaw);
     ind = 0;
 }
 float PurePursuitAlgorithm::PIDControl() {
-    float a = Kp * (target_speed - current_speed);
-    return a;
+    return Kp * (target_speed - state.getVelocity);
 }
 void PurePursuitAlgorithm::update(float time_stamp, float position_x, float position_y, float yaw) {
     state.update(time_stamp, position_x, position_y, yaw);
@@ -16,12 +15,16 @@ void PurePursuitAlgorithm::update(float time_stamp, float position_x, float posi
     float di = indexUpdate();
     current_ind = ind;
 
-    float newSpeed = (state.getVelocity + ai);
+    float newVelocity = state.getVelocity + ai;
+    float newVelocityYaw = state.getVelocityYaw + di;
 
     if (current_ind != ROUTE_SIZE - 1) {
-        float angleB = getDifferenceAngle(angleList[current_ind], getAngle());
-        setConvertedSpeed(newSpeed * cosf(speedVectorAngle + di),
-                          newSpeed * sinf(speedVectorAngle + di), angleB);
+        vel.linear.x = newVelocity * cosf(newVelocityYaw);
+        vel.linear.y = newVelocity * sinf(newVelocityYaw);
+        vel.linear.z = newVelocity * sinf(newVelocityYaw);
+        vel.angular.x = 0;
+        vel.angular.y = 0;
+        vel.angular.z = getDifferenceAngle(angleList[current_ind], state.getYaw);
     }
     // } else {
     //     //最終地点に到達したときのみ 最終地点で停止する
@@ -49,27 +52,27 @@ float PurePursuitAlgorithm::indexUpdate() {
         ind = ROUTE_SIZE - 1;
     }
 
-    float alpha = getDifferenceAngle(atan2f(ty - state.y, tx - state.x), state.yaw);
+    float alpha = getDifferenceAngle(atan2f(ty - state.getPositionY, tx - state.getPositionX), state.getVelocityYaw);
 
     return alpha;
 }
 int PurePursuitAlgorithm::calculateTargetIndex() {
-    float dx = cx[ind] - state.x;
-    float dy = cy[ind] - state.y;
+    float dx = cx[ind] - state.getPositionX;
+    float dy = cy[ind] - state.getPositionY;
     float L = std::hypot(dx, dy);
 
     float Lf = k * state.v + Lfc;
     while (Lf > L && (ind + 1) < ROUTE_SIZE) {
-        dx = cx[ind] - state.x;
-        dy = cy[ind] - state.y;
+        dx = cx[ind] - state.getPositionX;
+        dy = cy[ind] - state.getPositionY;
         L = std::hypot(dx, dy);
         ind += 1;
     }
     return ind;
 }
 float PurePursuitAlgorithm::calculateDistance(float pointX, float pointY) {
-    float dx = state.x - pointX;
-    float dy = state.y - pointY;
+    float dx = state.getPositionX - pointX;
+    float dy = state.getPositionY - pointY;
     return sqrtf(dx * dx + dy * dy);
 }
 //angle2を原点として、angle1との差を返す
@@ -107,3 +110,7 @@ float PurePursuitAlgorithm::convertAngle(float convertedAngle) {
 
     return a1;
 }
+
+geometry_msgs::Twist PurePursuitAlgorithm::getCommandVelocity() {
+    return vel;
+};
