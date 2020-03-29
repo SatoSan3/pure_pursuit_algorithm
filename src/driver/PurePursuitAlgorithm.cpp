@@ -4,15 +4,38 @@ void PurePursuitAlgorithm::init(float newX, float newY, float newYaw, float newV
     state.init(newX, newY, newYaw, newV);
     ind = 0;
 }
-float PurePursuitAlgorithm::PIDControl(float target, float current) {
-    float a = Kp * (target - current);
+float PurePursuitAlgorithm::PIDControl() {
+    float a = Kp * (target_speed - current_speed);
     return a;
 }
-float PurePursuitAlgorithm::update(int pind) {
+void PurePursuitAlgorithm::update(float time_stamp, float position_x, float position_y, float yaw) {
+    state.update(time_stamp, position_x, position_y, yaw);
+    current_ind = calculateTargetIndex();
+
+    float ai = PIDControl();
+    float di = indexUpdate();
+    current_ind = ind;
+
+    float newSpeed = (state.getVelocity + ai);
+
+    if (current_ind != ROUTE_SIZE - 1) {
+        float angleB = getDifferenceAngle(angleList[current_ind], getAngle());
+        setConvertedSpeed(newSpeed * cosf(speedVectorAngle + di),
+                          newSpeed * sinf(speedVectorAngle + di), angleB);
+    }
+    // } else {
+    //     //最終地点に到達したときのみ 最終地点で停止する
+    //     moveTargetPoint(ppa.cx[ROUTE_SIZE - 1], ppa.cy[ROUTE_SIZE - 1], angleList[ROUTE_SIZE - 1]);
+    // }
+}
+void PurePursuitAlgorithm::setTargetSpeed(float new_target_speed) {
+    target_speed = new_target_speed;
+}
+float PurePursuitAlgorithm::indexUpdate() {
     ind = calculateTargetIndex();
 
-    if (pind >= ind) {
-        ind = pind;
+    if (current_ind >= ind) {
+        ind = current_ind;
     }
 
     float tx, ty;

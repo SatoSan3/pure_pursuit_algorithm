@@ -10,7 +10,6 @@
 namespace {
 PurePursuitAlgorithm ppa;
 
-float angleList[ROUTE_SIZE];
 float speedVector;
 float speedVectorAngle;
 float x = 0, y = 0, angle = 0;
@@ -244,10 +243,11 @@ int main(int argc, char** argv) {
         // ppa.cy[i] = static_cast<float>(i % 100) * 5 - 5.f * 100.f / 2.f;
         // ppa.cx[i] = 0;
 
-        angleList[i] = 0.01 * static_cast<float>(i);
+        ppa.angleList[i] = 0.01 * static_cast<float>(i);
         //angleList[i] = 0.1;
     }
     ppa.init(0, 0, 0, 0);
+    ppa.setTargetSpeed(0.4);
 
     ow.init(nh);
 
