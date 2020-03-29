@@ -34,11 +34,11 @@ public:
 
         return true;
     }
-    float getPositionX(){return position_x};
-    float getPositionY(){return position_y};
-    float getYaw(){return yaw};
-    float getVelocity(){return velocity};
-    float getVelocityYaw(){return velocityYaw};
+    float getPositionX() { return position_x; }
+    float getPositionY() { return position_y; }
+    float getYaw() { return yaw; }
+    float getVelocity() { return velocity; }
+    float getVelocityYaw() { return velocityYaw; }
 
     float time_stamp, position_x, position_y, yaw, velocity, velocityYaw;
 };
@@ -49,7 +49,7 @@ public:
     float PIDControl();
     void update(float time_stamp, float position_x, float position_y, float yaw);
     void setTargetSpeed(float new_target_speed);
-    float indexUpdate(int pind);
+    float indexUpdate();
     //単位はそれぞれ s , m ,  m , rad
     float stateUpdate(float time_stamp, float position_x, float position_y, float yaw);
     int calculateTargetIndex();
