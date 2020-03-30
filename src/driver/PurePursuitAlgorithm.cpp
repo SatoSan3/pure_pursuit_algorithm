@@ -16,15 +16,17 @@ void PurePursuitAlgorithm::update(float time_stamp, float position_x, float posi
     current_ind = ind;
 
     float newVelocity = state.getVelocity() + ai;
-    float newVelocityYaw = state.getVelocityYaw() + di;
+    float newVelocityYaw = state.getVelocityYaw() - state.getYaw() + di;
 
     if (current_ind != ROUTE_SIZE - 1) {
         vel.linear.x = newVelocity * cosf(newVelocityYaw);
         vel.linear.y = newVelocity * sinf(newVelocityYaw);
-        vel.linear.z = newVelocity * sinf(newVelocityYaw);
+        vel.linear.z = 0;
         vel.angular.x = 0;
         vel.angular.y = 0;
         vel.angular.z = getDifferenceAngle(angleList[current_ind], state.getYaw());
+
+        std::cout << angleList[current_ind] << " , " << state.getYaw() << std::endl;
     }
     // } else {
     //     //最終地点に到達したときのみ 最終地点で停止する

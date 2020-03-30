@@ -106,8 +106,8 @@ int main(int argc, char** argv) {
         // angleList[i] = 0;
 
         //砂時計経路
-        ppa.cy[i] = sin(static_cast<float>(i) / 100.f) * 5;
-        ppa.cx[i] = sin(static_cast<float>(i) / 100.f * 2.f) * 5;
+        ppa.cy[i] = sin(static_cast<float>(i) / 100.f) * 2.f;
+        ppa.cx[i] = sin(static_cast<float>(i) / 100.f * 2.f) * 2.f;
 
         //往復経路
         // ppa.cy[i] = static_cast<float>(i % 100) * 5 - 5.f * 100.f / 2.f;
