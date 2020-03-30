@@ -49,7 +49,7 @@ public:
     float PIDControl();
     void update(float time_stamp, float position_x, float position_y, float yaw);
     void setTargetSpeed(float new_target_speed);
-    float indexUpdate();
+    void indexUpdate();
     //単位はそれぞれ s , m ,  m , rad
     float stateUpdate(float time_stamp, float position_x, float position_y, float yaw);
     int calculateTargetIndex();
@@ -67,7 +67,7 @@ public:
 
     float target_speed, current_speed;
 
-    int ind, current_ind;
+    int ind;
     State state;
     float cx[ROUTE_SIZE];
     float cy[ROUTE_SIZE];

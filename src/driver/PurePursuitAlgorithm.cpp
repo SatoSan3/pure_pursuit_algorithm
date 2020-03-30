@@ -9,38 +9,33 @@ float PurePursuitAlgorithm::PIDControl() {
 }
 void PurePursuitAlgorithm::update(float time_stamp, float position_x, float position_y, float yaw) {
     state.update(time_stamp, position_x, position_y, yaw);
-    current_ind = calculateTargetIndex();
+    calculateTargetIndex();
 
     float ai = PIDControl();
-    float di = indexUpdate();
-    current_ind = ind;
+    indexUpdate();
+    float di = getDifferenceAngle(atan2f(cy[ind] - state.getPositionY(), cx[ind] - state.getPositionX()), state.getVelocityYaw());
 
     float newVelocity = state.getVelocity() + ai;
     float newVelocityYaw = state.getVelocityYaw() - state.getYaw() + di;
 
-    if (current_ind != ROUTE_SIZE - 1) {
+    if (ind != ROUTE_SIZE - 1) {
         vel.linear.x = newVelocity * cosf(newVelocityYaw);
         vel.linear.y = newVelocity * sinf(newVelocityYaw);
         vel.linear.z = 0;
         vel.angular.x = 0;
         vel.angular.y = 0;
-        vel.angular.z = getDifferenceAngle(angleList[current_ind], state.getYaw());
-
-        std::cout << angleList[current_ind] << " , " << state.getYaw() << std::endl;
+        vel.angular.z = getDifferenceAngle(angleList[ind], state.getYaw());
     }
-    // } else {
-    //     //最終地点に到達したときのみ 最終地点で停止する
-    //     moveTargetPoint(ppa.cx[ROUTE_SIZE - 1], ppa.cy[ROUTE_SIZE - 1], angleList[ROUTE_SIZE - 1]);
-    // }
 }
 void PurePursuitAlgorithm::setTargetSpeed(float new_target_speed) {
     target_speed = new_target_speed;
 }
-float PurePursuitAlgorithm::indexUpdate() {
+void PurePursuitAlgorithm::indexUpdate() {
+    int old_ind = ind;
     ind = calculateTargetIndex();
 
-    if (current_ind >= ind) {
-        ind = current_ind;
+    if (old_ind >= ind) {
+        ind = old_ind;
     }
 
     float tx, ty;
@@ -54,9 +49,7 @@ float PurePursuitAlgorithm::indexUpdate() {
         ind = ROUTE_SIZE - 1;
     }
 
-    float alpha = getDifferenceAngle(atan2f(ty - state.getPositionY(), tx - state.getPositionX()), state.getVelocityYaw());
-
-    return alpha;
+    //float alpha = getDifferenceAngle(atan2f(ty - state.getPositionY(), tx - state.getPositionX()), state.getVelocityYaw());
 }
 int PurePursuitAlgorithm::calculateTargetIndex() {
     float dx = cx[ind] - state.getPositionX();
