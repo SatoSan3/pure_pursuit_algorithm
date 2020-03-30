@@ -6,6 +6,8 @@
 #include <geometry_msgs/Twist.h>
 #include <math.h>
 
+#include <nav_msgs/Path.h>
+
 class State {
 public:
     void init(float new_time_stamp, float new_position_x, float new_position_y, float new_yaw) {
@@ -58,6 +60,7 @@ public:
     float getDifferenceAngle(float angle1, float angle2);
     float convertAngle(float convertedAngle);
     geometry_msgs::Twist getCommandVelocity();
+    void setPath(const nav_msgs::Path& new_path);
 
     const float k = 0.4;    // look forward gain
     const float Lfc = 0.20; // look-ahead distance
@@ -72,6 +75,8 @@ public:
     float cx[ROUTE_SIZE];
     float cy[ROUTE_SIZE];
     float angleList[ROUTE_SIZE];
+
+    nav_msgs::Path path;
 
     geometry_msgs::Twist vel;
 };

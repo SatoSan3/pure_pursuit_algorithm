@@ -9,11 +9,14 @@ float PurePursuitAlgorithm::PIDControl() {
 }
 void PurePursuitAlgorithm::update(float time_stamp, float position_x, float position_y, float yaw) {
     state.update(time_stamp, position_x, position_y, yaw);
+    if (path.poses.size() <= 0) {
+        return;
+    }
     calculateTargetIndex();
 
     float ai = PIDControl();
     indexUpdate();
-    float di = getDifferenceAngle(atan2f(cy[ind] - state.getPositionY(), cx[ind] - state.getPositionX()), state.getVelocityYaw());
+    float di = getDifferenceAngle(atan2f(path.poses[ind].pose.position.y - state.getPositionY(), path.poses[ind].pose.position.x - state.getPositionX()), state.getVelocityYaw());
 
     float newVelocity = state.getVelocity() + ai;
     float newVelocityYaw = state.getVelocityYaw() - state.getYaw() + di;
@@ -40,26 +43,21 @@ void PurePursuitAlgorithm::indexUpdate() {
 
     float tx, ty;
 
-    if (ind < ROUTE_SIZE) {
-        tx = cx[ind];
-        ty = cy[ind];
-    } else {
-        tx = cx[ROUTE_SIZE - 1];
-        ty = cy[ROUTE_SIZE - 1];
-        ind = ROUTE_SIZE - 1;
+    if (ind >= path.poses.size()) {
+        ind = path.poses.size() - 1;
     }
 
     //float alpha = getDifferenceAngle(atan2f(ty - state.getPositionY(), tx - state.getPositionX()), state.getVelocityYaw());
 }
 int PurePursuitAlgorithm::calculateTargetIndex() {
-    float dx = cx[ind] - state.getPositionX();
-    float dy = cy[ind] - state.getPositionY();
+    float dx = path.poses[ind].pose.position.x - state.getPositionX();
+    float dy = path.poses[ind].pose.position.y - state.getPositionY();
     float L = std::hypot(dx, dy);
 
     float Lf = k * state.getVelocity() + Lfc;
     while (Lf > L && (ind + 1) < ROUTE_SIZE) {
-        dx = cx[ind] - state.getPositionX();
-        dy = cy[ind] - state.getPositionY();
+        dx = path.poses[ind].pose.position.x - state.getPositionX();
+        dy = path.poses[ind].pose.position.y - state.getPositionY();
         L = std::hypot(dx, dy);
         ind += 1;
     }
@@ -109,3 +107,7 @@ float PurePursuitAlgorithm::convertAngle(float convertedAngle) {
 geometry_msgs::Twist PurePursuitAlgorithm::getCommandVelocity() {
     return vel;
 };
+
+void PurePursuitAlgorithm::setPath(const nav_msgs::Path& new_path) {
+    path = new_path;
+}

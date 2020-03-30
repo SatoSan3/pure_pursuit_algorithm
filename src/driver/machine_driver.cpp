@@ -78,6 +78,7 @@ VirtualOmniWheels ow;
 
 void receivePath(const nav_msgs::Path& path) {
     std::cout << "receive" << std::endl;
+    ppa.setPath(path);
 }
 
 int main(int argc, char** argv) {
