@@ -74,17 +74,15 @@ int main(int argc, char** argv)
 
     ow.init(nh);
 
+    std::string path_list_name, path_file_directory;
+    nh.getParam("path_list_name", path_list_name);
+    nh.getParam("path_file_directory", path_file_directory);
+    PathReader path_reader;
+    path_reader.read_path_file_list(path_file_directory, path_list_name);
+
     ppa.init(ow.time_stamp, ow.positionX, ow.positionY, ow.machineAngle);
     ppa.setTargetSpeed(0.4);
-
-    int i = 0;
-
-    std::string file_name;
-    nh.getParam("test_param", file_name);
-    std::cout << "file_name??? = " << file_name << std::endl;
-
-    PathReader path_reader;
-    ppa.setPath(path_reader.readPath(file_name));
+    ppa.setPath(path_reader.readPath(1));
 
     while (ros::ok()) {
         ros::spinOnce();

@@ -8,9 +8,11 @@
 
 #include "DataManager.hpp"
 
-class PathReader {
+class PathReader
+{
 public:
-    nav_msgs::Path makePath(std::vector<std::vector<double>> path_data) {
+    nav_msgs::Path makePath(std::vector<std::vector<double>> path_data)
+    {
         nav_msgs::Path path;
         path.header.frame_id = "map";
         path.header.stamp = ros::Time::now();
@@ -29,7 +31,8 @@ public:
 
         return path;
     }
-    nav_msgs::Path readPath(std::string path_file_name) {
+    nav_msgs::Path readPath(std::string path_file_name)
+    {
         DataManager data_manager;
         data_manager.readFileData(path_file_name);
         std::vector<std::vector<double>> a = data_manager.getStoredData();
@@ -45,4 +48,19 @@ public:
 
         return path;
     }
+    nav_msgs::Path readPath(int n)
+    {
+        return readPath(file_name_list[n]);
+    }
+    void read_path_file_list(std::string path_file_directory, std::string path_file_list)
+    {
+        std::ifstream ifs(path_file_directory + path_file_list);
+
+        std::string line;
+        while (std::getline(ifs, line)) {
+            file_name_list.push_back(path_file_directory + line);
+        }
+    }
+
+    std::vector<std::string> file_name_list;
 };
