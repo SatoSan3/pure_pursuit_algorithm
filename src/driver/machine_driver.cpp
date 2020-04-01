@@ -5,22 +5,27 @@
 
 #include <string>
 
+#include "PathReader.hpp"
 #include "PurePursuitAlgorithm.hpp"
 
-class VirtualOmniWheels {
+class VirtualOmniWheels
+{
 public:
-    void init(ros::NodeHandle nh) {
+    void init(ros::NodeHandle nh)
+    {
         pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel", 10);
         positionX = 0;
         positionY = 0;
         machineAngle = 0;
         update();
     }
-    void setSpeed(geometry_msgs::Twist vel) {
+    void setSpeed(geometry_msgs::Twist vel)
+    {
         pub.publish(vel);
     }
     //オドメトリの情報を更新する
-    void update() {
+    void update()
+    {
         //オドメトリ(tf)取得の準備
         static tf::TransformListener ln;
         const std::string target_frame = "odom";
@@ -45,8 +50,8 @@ public:
             positionX = target_pose.pose.position.x;
             positionY = target_pose.pose.position.y;
             machineAngle = atan2f((target_pose.pose.orientation.x + target_pose.pose.orientation.y + target_pose.pose.orientation.z), target_pose.pose.orientation.w) * 2.f;
-
-        } catch (...) {
+        }
+        catch (...) {
             ROS_INFO("tf error");
         }
     }
@@ -55,22 +60,17 @@ public:
 private:
     ros::Publisher pub;
 };
-namespace {
+namespace
+{
 PurePursuitAlgorithm ppa;
 VirtualOmniWheels ow;
 } // namespace
 
-void receivePath(const nav_msgs::Path& path) {
-    std::cout << "receive" << std::endl;
-    ppa.setPath(path);
-}
-
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
     ros::init(argc, argv, "machine_driver2");
-    ros::NodeHandle nh;
+    ros::NodeHandle nh("~");
     ros::Rate rate(10);
-
-    ros::Subscriber sub = nh.subscribe("path/robot_path", 10, receivePath);
 
     ow.init(nh);
 
@@ -78,14 +78,20 @@ int main(int argc, char** argv) {
     ppa.setTargetSpeed(0.4);
 
     int i = 0;
+
+    std::string file_name;
+    nh.getParam("test_param", file_name);
+    std::cout << "file_name??? = " << file_name << std::endl;
+
+    PathReader path_reader;
+    ppa.setPath(path_reader.readPath(file_name));
+
     while (ros::ok()) {
         ros::spinOnce();
-        ow.update();
-        // updatePurePursuitAlgorithm();
-        ppa.update(ow.time_stamp, ow.positionX, ow.positionY, ow.machineAngle);
 
-        geometry_msgs::Twist cmd_vel = ppa.getCommandVelocity();
-        ow.setSpeed(cmd_vel);
+        ow.update();
+        ppa.update(ow.time_stamp, ow.positionX, ow.positionY, ow.machineAngle);
+        ow.setSpeed(ppa.getCommandVelocity());
 
         rate.sleep();
     }

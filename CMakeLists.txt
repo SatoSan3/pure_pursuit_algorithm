@@ -212,12 +212,7 @@ add_executable(
   machine_driver2 
   src/driver/machine_driver.cpp
   src/driver/PurePursuitAlgorithm.cpp
+  src/driver/DataManager.cpp
   )
-add_executable(
-  path_publisher 
-  src/path_publisher/path_publisher.cpp
-  src/path_publisher/DataManager.cpp
-)
 
 target_link_libraries(machine_driver2 ${catkin_LIBRARIES})
-target_link_libraries(path_publisher ${catkin_LIBRARIES})
