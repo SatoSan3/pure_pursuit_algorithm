@@ -68,7 +68,7 @@ VirtualOmniWheels ow;
 
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "machine_driver2");
+    ros::init(argc, argv, "machine_driver");
     ros::NodeHandle nh("~");
     ros::Rate rate(10);
 

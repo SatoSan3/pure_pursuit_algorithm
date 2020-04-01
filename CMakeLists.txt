@@ -209,10 +209,10 @@ include_directories(
 # catkin_add_nosetests(test)
 
 add_executable(
-  machine_driver2 
+  machine_driver
   src/driver/machine_driver.cpp
   src/driver/PurePursuitAlgorithm.cpp
   src/driver/DataManager.cpp
   )
 
-target_link_libraries(machine_driver2 ${catkin_LIBRARIES})
+target_link_libraries(machine_driver ${catkin_LIBRARIES})
