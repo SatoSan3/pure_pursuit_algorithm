@@ -48,36 +48,29 @@ public:
 class PurePursuitAlgorithm {
 public:
     void init(float newX, float newY, float newYaw, float newV);
-    float PIDControl();
     void update(float time_stamp, float position_x, float position_y, float yaw);
     void setTargetSpeed(float new_target_speed);
+    void setPath(const nav_msgs::Path& new_path);
+    geometry_msgs::Twist getCommandVelocity();
+
+private:
+    float PIDControl();
     void indexUpdate();
     //単位はそれぞれ s , m ,  m , rad
     float stateUpdate(float time_stamp, float position_x, float position_y, float yaw);
     int calculateTargetIndex();
-    float calculateDistance(float pointX, float pointY);
     //angle2を原点として、angle1との差を返す
     float getDifferenceAngle(float angle1, float angle2);
     float convertAngle(float convertedAngle);
-    geometry_msgs::Twist getCommandVelocity();
-    void setPath(const nav_msgs::Path& new_path);
+    float calculateDistance(float pointX, float pointY);
 
     const float k = 0.4;    // look forward gain
     const float Lfc = 0.20; // look-ahead distance
     const float Kp = 1.0;   //speed proportional gain
-    const float dt = 0.1;   //[s]
-    const float L = 0.9;    //[m] wheel base of vehicle
-
-    float target_speed, current_speed;
-
+    float target_speed;
     int ind;
     State state;
-    float cx[ROUTE_SIZE];
-    float cy[ROUTE_SIZE];
-    float angleList[ROUTE_SIZE];
-
     nav_msgs::Path path;
-
     geometry_msgs::Twist vel;
 };
 

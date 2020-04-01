@@ -27,7 +27,8 @@ void PurePursuitAlgorithm::update(float time_stamp, float position_x, float posi
         vel.linear.z = 0;
         vel.angular.x = 0;
         vel.angular.y = 0;
-        vel.angular.z = getDifferenceAngle(angleList[ind], state.getYaw());
+        float temp_angle = std::atan2(path.poses[ind].pose.orientation.z, path.poses[ind].pose.orientation.w) * 2;
+        vel.angular.z = getDifferenceAngle(temp_angle, state.getYaw());
     }
 }
 void PurePursuitAlgorithm::setTargetSpeed(float new_target_speed) {
@@ -66,7 +67,7 @@ int PurePursuitAlgorithm::calculateTargetIndex() {
 float PurePursuitAlgorithm::calculateDistance(float pointX, float pointY) {
     float dx = state.getPositionX() - pointX;
     float dy = state.getPositionY() - pointY;
-    return sqrtf(dx * dx + dy * dy);
+    return std::hypot(dx, dy);
 }
 //angle2を原点として、angle1との差を返す
 float PurePursuitAlgorithm::getDifferenceAngle(float angle1, float angle2) {

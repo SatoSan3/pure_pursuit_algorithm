@@ -11,6 +11,7 @@
 nav_msgs::Path makePath(std::vector<std::vector<double>> path_data) {
     nav_msgs::Path path;
     path.header.frame_id = "map";
+    path.header.stamp = ros::Time::now();
     for (int i = 0; i < path_data.size(); ++i) {
         geometry_msgs::PoseStamped ps;
         ps.pose.position.x = path_data[i][0];

@@ -7,14 +7,6 @@
 
 #include "PurePursuitAlgorithm.hpp"
 
-namespace {
-PurePursuitAlgorithm ppa;
-
-float speedVector;
-float speedVectorAngle;
-float x = 0, y = 0, angle = 0;
-} // namespace
-
 class VirtualOmniWheels {
 public:
     void init(ros::NodeHandle nh) {
@@ -40,8 +32,7 @@ public:
         ros::Time time = ros::Time::now();
 
         static float oldTime = 0;
-        float newTime = time.sec + time.nsec / (1000.f * 1000.f * 1000.f);
-        float dt = newTime - oldTime;
+        time_stamp = time.sec + time.nsec / (1000.f * 1000.f * 1000.f);
 
         static float oldPositionX = 0;
         static float oldPositionY = 0;
@@ -55,17 +46,9 @@ public:
             positionY = target_pose.pose.position.y;
             machineAngle = atan2f((target_pose.pose.orientation.x + target_pose.pose.orientation.y + target_pose.pose.orientation.z), target_pose.pose.orientation.w) * 2.f;
 
-            speedVector = std::hypot(positionX - oldPositionX, positionY - oldPositionY) / dt;
-            speedVectorAngle = atan2f(positionY - oldPositionY, positionX - oldPositionX);
-
-            oldPositionX = positionX;
-            oldPositionY = positionY;
-            oldTime = newTime;
-
         } catch (...) {
             ROS_INFO("tf error");
         }
-        time_stamp = newTime;
     }
     float time_stamp, positionX, positionY, machineAngle, speed, speedAngle;
 
@@ -73,8 +56,9 @@ private:
     ros::Publisher pub;
 };
 namespace {
+PurePursuitAlgorithm ppa;
 VirtualOmniWheels ow;
-}
+} // namespace
 
 void receivePath(const nav_msgs::Path& path) {
     std::cout << "receive" << std::endl;
@@ -87,36 +71,6 @@ int main(int argc, char** argv) {
     ros::Rate rate(10);
 
     ros::Subscriber sub = nh.subscribe("path/robot_path", 10, receivePath);
-
-    //速度制御(cmd_vel)の準備
-
-    //経路追従関連の初期化
-    for (int i = 0; i < ROUTE_SIZE; ++i) {
-        // if (i < 314 * 2) {
-        //     ppa.cy[i] = static_cast<float>(i) / 2.f;
-        //     ppa.cx[i] = sin(static_cast<float>(i) / 100.f) * 150;
-        //     angleList[i] = 0;
-        // } else {
-        //     ppa.cy[i] = static_cast<float>(i) / 2.f;
-        //     ppa.cx[i] = 0;
-        //     angleList[i] = M_PI * 10 / 4.0 / (ROUTE_SIZE - 314 * 2) * (i - 314 * 2);
-        //     //angleList[i] = 0;
-        // }
-        // ppa.cy[i] = sin(static_cast<float>(i) / 100.f) * 500;
-        // ppa.cx[i] = cos(static_cast<float>(i) / 100.f * 2.f) * 500;
-        // angleList[i] = 0;
-
-        //砂時計経路
-        ppa.cy[i] = sin(static_cast<float>(i) / 100.f) * 2.f;
-        ppa.cx[i] = sin(static_cast<float>(i) / 100.f * 2.f) * 2.f;
-
-        //往復経路
-        // ppa.cy[i] = static_cast<float>(i % 100) * 5 - 5.f * 100.f / 2.f;
-        // ppa.cx[i] = 0;
-
-        ppa.angleList[i] = 0.01 * static_cast<float>(i);
-        //angleList[i] = 0.1;
-    }
 
     ow.init(nh);
 
