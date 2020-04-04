@@ -57,6 +57,7 @@ public:
     void setPath(const nav_msgs::Path& new_path);
     geometry_msgs::Twist getCommandVelocity();
     bool judgeGoal();
+    float getRate();
 
 private:
     float PIDControl();

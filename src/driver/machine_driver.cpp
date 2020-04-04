@@ -10,6 +10,7 @@
 #include "PathReader.hpp"
 #include "PurePursuitAlgorithm.hpp"
 
+typedef actionlib::SimpleActionServer<pure_pursuit_algorithm::PathAction> Server;
 class VirtualOmniWheels
 {
 public:
@@ -84,45 +85,41 @@ int main(int argc, char** argv)
 
     ppa.init(ow.time_stamp, ow.positionX, ow.positionY, ow.machineAngle);
     ppa.setTargetSpeed(0.4);
-    ppa.setPath(path_reader.readPath(1));
 
-    // Server server(nh, "route_selection_server", false);
-    // server.start();
-    // test_action::TestGoalConstPtr current_goal;
+    Server server(nh, "route_selection_server", false);
+    server.start();
+    pure_pursuit_algorithm::PathGoalConstPtr current_goal;
 
     while (ros::ok()) {
         ros::spinOnce();
 
-        // if (server.isNewGoalAvailable()) {
-        //     current_goal = server.acceptNewGoal();
-        //     printf("Update Goal\n");
-        // }
+        if (server.isNewGoalAvailable()) {
+            current_goal = server.acceptNewGoal();
+            int a = current_goal->path_number;
+            ppa.setPath(path_reader.readPath(a));
+            std::cout << "Update Goal" << std::endl;
+        }
 
-        // if (server.isActive()) {
-        //     if (server.isPreemptRequested()) {
-        //         server.setAborted();
-        //         //server.setPreempted();
-        //         printf("Preempt Goal\n");
-        //     } else {
-        //         if (start_time + ros::Duration(current_goal->duration) < ros::Time::now()) {
-        //             server.setSucceeded();
-        //             printf("Active: publish result id:%i\n", current_goal->task_id);
-        //         } else {
-        //             test_action::TestFeedback feedback;
-        //             feedback.rate = (ros::Time::now() - start_time).toSec() / current_goal->duration;
-        //             server.publishFeedback(feedback);
-        //             printf("Active: publish feedback id:%i\n", current_goal->task_id);
-        //         }
-        //     }
-        // }
+        if (server.isActive()) {
+            if (server.isPreemptRequested()) {
+                server.setAborted();
+                std::cout << "Preempt Goal" << std::endl;
+            } else {
+                if (ppa.judgeGoal()) {
+                    server.setSucceeded();
+                    std::cout << "server Succeeded" << std::endl;
+                } else {
+                    pure_pursuit_algorithm::PathFeedback feedback;
+                    feedback.rate = ppa.getRate();
+                    server.publishFeedback(feedback);
+                    std::cout << "path rate" << feedback.rate << std::endl;
+                }
+            }
+        }
 
         ow.update();
         ppa.update(ow.time_stamp, ow.positionX, ow.positionY, ow.machineAngle);
         ow.setSpeed(ppa.getCommandVelocity());
-
-        if (ppa.judgeGoal()) {
-            std::cout << "reach goal " << std::endl;
-        }
 
         rate.sleep();
     }

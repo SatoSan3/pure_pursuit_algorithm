@@ -122,6 +122,7 @@ geometry_msgs::Twist PurePursuitAlgorithm::getCommandVelocity()
 void PurePursuitAlgorithm::setPath(const nav_msgs::Path& new_path)
 {
     path = new_path;
+    ind = 0;
 }
 
 bool PurePursuitAlgorithm::judgeGoal()
@@ -130,4 +131,13 @@ bool PurePursuitAlgorithm::judgeGoal()
         return true;
     }
     return false;
+}
+
+float PurePursuitAlgorithm::getRate()
+{
+    //ゼロ除算対策
+    if (path.poses.size() == 0) {
+        return 0;
+    }
+    return static_cast<float>(ind + 1) / static_cast<float>(path.poses.size());
 }
