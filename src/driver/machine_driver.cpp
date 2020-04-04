@@ -2,6 +2,8 @@
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Path.h>
 #include <tf/transform_listener.h>
+#include <pure_pursuit_algorithm/PathAction.h>
+#include <actionlib/server/simple_action_server.h>
 
 #include <string>
 
@@ -84,12 +86,43 @@ int main(int argc, char** argv)
     ppa.setTargetSpeed(0.4);
     ppa.setPath(path_reader.readPath(1));
 
+    // Server server(nh, "route_selection_server", false);
+    // server.start();
+    // test_action::TestGoalConstPtr current_goal;
+
     while (ros::ok()) {
         ros::spinOnce();
+
+        // if (server.isNewGoalAvailable()) {
+        //     current_goal = server.acceptNewGoal();
+        //     printf("Update Goal\n");
+        // }
+
+        // if (server.isActive()) {
+        //     if (server.isPreemptRequested()) {
+        //         server.setAborted();
+        //         //server.setPreempted();
+        //         printf("Preempt Goal\n");
+        //     } else {
+        //         if (start_time + ros::Duration(current_goal->duration) < ros::Time::now()) {
+        //             server.setSucceeded();
+        //             printf("Active: publish result id:%i\n", current_goal->task_id);
+        //         } else {
+        //             test_action::TestFeedback feedback;
+        //             feedback.rate = (ros::Time::now() - start_time).toSec() / current_goal->duration;
+        //             server.publishFeedback(feedback);
+        //             printf("Active: publish feedback id:%i\n", current_goal->task_id);
+        //         }
+        //     }
+        // }
 
         ow.update();
         ppa.update(ow.time_stamp, ow.positionX, ow.positionY, ow.machineAngle);
         ow.setSpeed(ppa.getCommandVelocity());
+
+        if (ppa.judgeGoal()) {
+            std::cout << "reach goal " << std::endl;
+        }
 
         rate.sleep();
     }

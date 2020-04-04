@@ -1,0 +1,9 @@
+# Define the goal
+uint32 task_id  
+uint32 path_number 
+---
+# Define the result
+bool done
+---
+# Define a feedback message
+float32 rate

@@ -8,9 +8,11 @@
 
 #include <nav_msgs/Path.h>
 
-class State {
+class State
+{
 public:
-    void init(float new_time_stamp, float new_position_x, float new_position_y, float new_yaw) {
+    void init(float new_time_stamp, float new_position_x, float new_position_y, float new_yaw)
+    {
         time_stamp = new_time_stamp;
         position_x = new_position_x;
         position_y = new_position_y;
@@ -18,7 +20,8 @@ public:
         velocity = 0;
         velocityYaw = 0;
     }
-    bool update(float new_time_stamp, float new_position_x, float new_position_y, float new_yaw) {
+    bool update(float new_time_stamp, float new_position_x, float new_position_y, float new_yaw)
+    {
         float dt = new_time_stamp - time_stamp;
         if (dt <= 0) {
             return false;
@@ -45,13 +48,15 @@ public:
     float time_stamp, position_x, position_y, yaw, velocity, velocityYaw;
 };
 
-class PurePursuitAlgorithm {
+class PurePursuitAlgorithm
+{
 public:
     void init(float newX, float newY, float newYaw, float newV);
     void update(float time_stamp, float position_x, float position_y, float yaw);
     void setTargetSpeed(float new_target_speed);
     void setPath(const nav_msgs::Path& new_path);
     geometry_msgs::Twist getCommandVelocity();
+    bool judgeGoal();
 
 private:
     float PIDControl();
